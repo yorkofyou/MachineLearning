@@ -56,7 +56,5 @@ def train_and_predict(path: str):
             # if t % 10 == 0:
                 # print('Iteration %d, loss = %.4f' % (t, loss.item()))
     with torch.no_grad():
-        predictions = model(X_valid_tensor).squeeze(dim=1)
+        predictions = model(X_valid_tensor)
         print("Root Mean Squared Error: " + str(torch.sqrt(F.mse_loss(predictions, y_valid_tensor))))
-
-# 5.6992
