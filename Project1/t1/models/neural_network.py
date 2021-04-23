@@ -1,3 +1,4 @@
+"""
 import torch
 from torch import nn as nn
 from torch import optim as optim
@@ -58,3 +59,4 @@ def train_and_predict(path: str):
     with torch.no_grad():
         predictions = model(X_valid_tensor)
         print("Root Mean Squared Error: " + str(torch.sqrt(F.mse_loss(predictions, y_valid_tensor))))
+"""
