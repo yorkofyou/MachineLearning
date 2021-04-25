@@ -16,6 +16,7 @@ def train_model(X: np.ndarray, y: np.ndarray) -> BaseEstimator:
     model = DecisionTreeRegressor(random_state=1)
     grid_object = GridSearchCV(model, parameters)
     grid_object.fit(X, y)
+    print(grid_object.best_params_)
     return grid_object
 
 

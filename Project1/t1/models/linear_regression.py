@@ -24,4 +24,4 @@ def train_and_predict(path: str, tau: int, normalize=False):
     print("Root Mean Squared Error: " + str(mean_squared_error(predictions, y_valid, squared=False)))
 
 
-train_and_predict('../traffic.txt', tau=2)
+train_and_predict('../electricity.txt', tau=24)
