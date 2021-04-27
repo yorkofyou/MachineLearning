@@ -20,7 +20,7 @@ n_train, n_val, n_test = 34, 5, 5
 
 
 n_his = 12
-n_pred = 3
+n_pred = 1
 n_route = 228
 Ks, Kt = 3, 3
 blocks = [[1, 32, 64], [64, 32, 128]]
@@ -75,4 +75,4 @@ for epoch in range(1, epochs + 1):
     if val_loss < min_val_loss:
         min_val_loss = val_loss
         torch.save(model.state_dict(), save_path)
-    print("epoch", epoch, ", train rmse:", torch.sqrt(l_sum / n), ", validation rmse:", torch.sqrt(val_loss))
+    print("epoch", epoch, ", train rmse:", math.sqrt(l_sum / n), ", validation rmse:", math.sqrt(val_loss))
