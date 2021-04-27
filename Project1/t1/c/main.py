@@ -27,7 +27,7 @@ blocks = [[1, 32, 64], [64, 32, 128]]
 drop_prob = 0
 
 batch_size = 50
-epochs = 50
+epochs = 2
 lr = 1e-3
 
 W = load_matrix(matrix_path)
@@ -37,9 +37,9 @@ Lk = torch.Tensor(Lk.astype(np.float32)).to(device)
 
 train, val, test = load_data(data_path, n_train * day_slot, n_val * day_slot)
 scaler = StandardScaler()
-# train = scaler.fit_transform(train)
-# val = scaler.transform(val)
-# test = scaler.transform(test)
+train = scaler.fit_transform(train)
+val = scaler.transform(val)
+test = scaler.transform(test)
 
 x_train, y_train = data_transform(train, n_his, n_pred, day_slot, device)
 x_val, y_val = data_transform(val, n_his, n_pred, day_slot, device)
@@ -75,4 +75,9 @@ for epoch in range(1, epochs + 1):
     if val_loss < min_val_loss:
         min_val_loss = val_loss
         torch.save(model.state_dict(), save_path)
-    print("epoch", epoch, ", train rmse:", math.sqrt(l_sum / n), ", validation rmse:", math.sqrt(val_loss))
+    print("epoch", epoch, ", train loss:", l_sum / n, ", validation loss:", val_loss)
+best_model = STGCN(Ks, Kt, blocks, n_his, n_route, Lk, drop_prob).to(device)
+best_model.load_state_dict(torch.load(save_path))
+l = evaluate_model(best_model, loss, test_iter)
+MAE, MAPE, RMSE = evaluate_metric(best_model, test_iter, scaler)
+print("test loss:", l, "\nMAE:", MAE, ", MAPE:", MAPE, ", RMSE:", RMSE)

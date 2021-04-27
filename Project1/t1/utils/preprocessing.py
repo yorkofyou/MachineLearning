@@ -9,7 +9,7 @@ class Dataset:
     def __init__(self, path: str, train_size=0.8):
         self.train_size = train_size
         self.data = pd.read_csv(path, header=None, delimiter=',').values
-        t, _ = self.data.shape
+        t, self.n = self.data.shape
         index = int(t * train_size)
         self.scaler = StandardScaler().fit(self.data[:index])
         self.train_mean, self.train_std = self.data[:index].mean(axis=0, keepdims=True).T, self.data[:index].std(axis=0, keepdims=True).T
@@ -52,6 +52,9 @@ class Dataset:
         X_train, X_valid = X_train.reshape((-1, f)), X_valid.reshape((-1, f))
         y_train, y_valid = y_train.reshape((-1)), y_valid.reshape((-1))
         return X_train, X_valid, y_train, y_valid
+
+    def reshape_labels(self, labels: np.ndarray) -> np.ndarray:
+        return labels.reshape((self.n, -1))
 
     def feature_extraction(self):
         sns.lineplot(data=self.data[1])
