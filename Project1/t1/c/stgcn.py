@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.init as init
 import torch.nn.functional as F
 
+
 class align(nn.Module):
     def __init__(self, c_in, c_out):
         super(align, self).__init__()
@@ -18,6 +19,7 @@ class align(nn.Module):
         if self.c_in < self.c_out:
             return F.pad(x, [0, 0, 0, 0, 0, self.c_out - self.c_in, 0, 0])
         return x
+
 
 class temporal_conv_layer(nn.Module):
     def __init__(self, kt, c_in, c_out, act="relu"):
@@ -40,6 +42,7 @@ class temporal_conv_layer(nn.Module):
             return torch.sigmoid(self.conv(x) + x_in)
         return torch.relu(self.conv(x) + x_in)
 
+
 class spatio_conv_layer(nn.Module):
     def __init__(self, ks, c, Lk):
         super(spatio_conv_layer, self).__init__()
@@ -59,6 +62,7 @@ class spatio_conv_layer(nn.Module):
         x_gc = torch.einsum("iok,bitkn->botn", self.theta, x_c) + self.b
         return torch.relu(x_gc + x)
 
+
 class st_conv_block(nn.Module):
     def __init__(self, ks, kt, n, c, p, Lk):
         super(st_conv_block, self).__init__()
@@ -75,6 +79,7 @@ class st_conv_block(nn.Module):
         x_ln = self.ln(x_t2.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
         return self.dropout(x_ln)
 
+
 class fully_conv_layer(nn.Module):
     def __init__(self, c):
         super(fully_conv_layer, self).__init__()
@@ -82,6 +87,7 @@ class fully_conv_layer(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
+
 
 class output_layer(nn.Module):
     def __init__(self, c, T, n):
@@ -96,6 +102,7 @@ class output_layer(nn.Module):
         x_ln = self.ln(x_t1.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
         x_t2 = self.tconv2(x_ln)
         return self.fc(x_t2)
+
 
 class STGCN(nn.Module):
     def __init__(self, ks, kt, bs, T, n, Lk, p):

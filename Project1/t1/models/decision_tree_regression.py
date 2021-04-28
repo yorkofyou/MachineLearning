@@ -1,6 +1,6 @@
 import os.path
 import pickle
-from random import seed, randint
+from random import seed
 
 import numpy as np
 from sklearn.metrics import mean_squared_error
@@ -23,20 +23,15 @@ def train_and_predict(path: str, tau: int, normalize=False) -> (np.ndarray, np.n
     model = DecisionTreeRegressor(random_state=1)
     grid_object = GridSearchCV(model, parameters)
     grid_object.fit(X_train, y_train)
-    filename = os.path.join('save', '_'.join(['decision_tree_regression', name])) + '.sav'
-    pickle.dump(model, open(filename, 'wb'))
+    filename = os.path.join('models', 'save', '_'.join(['decision_tree_regression', name])) + '.pkl'
+    pickle.dump(grid_object, open(filename, 'wb'))
     print(grid_object.best_params_)
     if normalize:
-        predictions = model.predict(X_valid)
+        predictions = grid_object.predict(X_valid)
         predictions = data.scaler.inverse_transform(predictions)
     else:
-        predictions = model.predict(X_valid)
+        predictions = grid_object.predict(X_valid)
     print("Root Mean Squared Error: " + str(mean_squared_error(predictions, y_valid, squared=False)))
     predictions = data.reshape_labels(predictions)
     y_valid = data.reshape_labels(y_valid)
-    # value = randint(0, data.n)
-    # plot_results(name, predictions[value], y_valid[value])
     return predictions, y_valid
-
-
-# train_and_predict('../commodity.txt', tau=7)

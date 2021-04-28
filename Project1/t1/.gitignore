@@ -143,3 +143,8 @@ cython_debug/
 # dataset
 *.txt
 *.csv
+
+# model
+*.pt
+*.pkl
+*.sav

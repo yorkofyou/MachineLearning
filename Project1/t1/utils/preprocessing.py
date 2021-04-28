@@ -46,9 +46,6 @@ class Dataset:
             X_train = self.scaler.transform(X_train.reshape((n, -1))).reshape((n, index, f))
             y_train = self.scaler.transform(y_train)
             X_valid = self.scaler.transform(X_valid.reshape((n, t-index, f))).reshape((n, t-index, f))
-            # X_train = ((X_train.reshape((n, -1)) - self.train_mean) / self.train_std).reshape((n, index, f))
-            # y_train = (y_train - self.train_mean) / self.train_std
-            # X_valid = ((X_valid.reshape((n, -1)) - self.valid_mean) / self.valid_std).reshape((n, t-index, f))
         X_train, X_valid = X_train.reshape((-1, f)), X_valid.reshape((-1, f))
         y_train, y_valid = y_train.reshape((-1)), y_valid.reshape((-1))
         return X_train, X_valid, y_train, y_valid
