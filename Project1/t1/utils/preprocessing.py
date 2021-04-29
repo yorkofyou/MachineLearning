@@ -14,11 +14,6 @@ class Dataset:
         self.scaler = StandardScaler().fit(self.data[:index])
         self.train_mean, self.train_std = self.data[:index].mean(axis=0, keepdims=True).T, self.data[:index].std(axis=0, keepdims=True).T
         self.valid_mean, self.valid_std = self.data[index:].mean(axis=0, keepdims=True).T, self.data[index:].std(axis=0, keepdims=True).T
-        self.data = np.delete(self.data, np.argwhere(self.valid_std == 0), axis=1)
-        self.train_mean = np.delete(self.train_mean, np.argwhere(self.valid_std == 0), axis=0)
-        self.train_std = np.delete(self.train_std, np.argwhere(self.valid_std == 0), axis=0)
-        self.valid_mean = np.delete(self.valid_mean, np.argwhere(self.valid_std == 0), axis=0)
-        self.valid_std = np.delete(self.valid_std, np.argwhere(self.valid_std == 0), axis=0)
 
     def generate_data(self, tau: int, time: str, normalize=False) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
         t, _ = self.data.shape
