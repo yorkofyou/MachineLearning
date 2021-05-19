@@ -9,32 +9,31 @@ class Dataset:
     def __init__(self, path: str):
         self.data = pd.read_csv(path, header=None, delimiter=',').values
         self.t, self.n = self.data.shape
-        self.scaler = StandardScaler()
 
-    def generate_data(self, tau: int, horizon: int, train_size=0.8, normalize=False) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
-        index = int(self.t * train_size)
-        self.scaler.fit(self.data[:index])
+    def generate_data(self, tau: int, horizon: int) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
         # self.train_mean, self.train_std = self.data[:index].mean(axis=0, keepdims=True).T, self.data[:index].std(axis=0, keepdims=True).T
         # self.valid_mean, self.valid_std = self.data[index:].mean(axis=0, keepdims=True).T, self.data[index:].std(axis=0, keepdims=True).T
+        self.data = self.data / np.max(np.abs(self.data), axis=0, keepdims=True)
         assert horizon > 0
-        features = np.array([np.vstack((self.data[i-tau: i], np.amin(self.data[: i], axis=0), np.amax(self.data[: i], axis=0))) for i in range(tau, self.t)])
+        features = np.array([self.data[i-tau: i] for i in range(tau, self.t-horizon+1)])
+        # features = np.array([np.vstack((self.data[i-tau: i], np.amin(self.data[: i], axis=0), np.amax(self.data[: i], axis=0))) for i in range(tau, self.t-horizon+1)])
         labels = self.data[tau+horizon-1:]
-        return self.train_test_split(np.transpose(features, (2, 0, 1)), np.transpose(labels, (1, 0)), train_size,
-                                     normalize=normalize)  # (N, T, F) and (N, T, )
+        return self.train_test_split(np.transpose(features, (2, 0, 1)), np.transpose(labels, (1, 0)))  # (N, T, F) and (N, T, )
 
-    def train_test_split(self, X: np.ndarray, y: np.ndarray, train_size=0.8, normalize=False) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    def train_test_split(self, X: np.ndarray, y: np.ndarray) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
         n, t, f = X.shape
-        assert 0 < train_size < 1
-        index = int(t * train_size)
-        X_train, y_train = X[:, :index, :], y[:, :index]
-        X_valid, y_valid = X[:, index:, :], y[:, index:]
-        if normalize:
-            X_train = self.scaler.transform(X_train.reshape((n, -1))).reshape((n, index, f))
-            y_train = self.scaler.transform(y_train)
-            X_valid = self.scaler.transform(X_valid.reshape((n, t-index, f))).reshape((n, t-index, f))
+        train_index = int(t * 0.6)
+        valid_index = int(t * 0.8)
+        X_train, y_train = X[:, :train_index, :], y[:, :train_index]
+        X_valid, y_valid = X[:, train_index: valid_index], y[:, train_index: valid_index]
+        X_test, y_test = X[: valid_index:], y[: valid_index]
         # X_train, X_valid = X_train.reshape((-1, f)), X_valid.reshape((-1, f))
         # y_train, y_valid = y_train.reshape((-1)), y_valid.reshape((-1))
-        return X_train, X_valid, y_train, y_valid
+        # Shuffle train set
+        rand_index = np.random.permutation(train_index)
+        X_train = X_train[:, rand_index, :]
+        y_train = y_train[:, rand_index]
+        return X_train, X_valid, X_test, y_train, y_valid, y_test
 
     def reshape_labels(self, labels: np.ndarray) -> np.ndarray:
         return labels.reshape((self.n, -1))
