@@ -12,13 +12,14 @@ from utils.plot import *
 class NeuralNetwork(nn.Module):
     def __init__(self, tau: int, dropout_prob: float):
         super(NeuralNetwork, self).__init__()
-        num_units = tau
+        num_units = 512
         self.gru = nn.GRU(1, num_units, batch_first=True)
         self.linear = nn.Linear(num_units, 1)
         self.dropout = nn.Dropout(dropout_prob)
 
     def forward(self, X):
-        _, out = self.dropout(self.gru(X.unsqueeze(-1), None))
+        _, out = self.gru(X.unsqueeze(-1), None)
+        out = self.dropout(out)
         out = self.linear(torch.squeeze(out[-1:, :, :], 0))
         return out.squeeze()
 

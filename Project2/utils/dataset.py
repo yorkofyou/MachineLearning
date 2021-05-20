@@ -23,7 +23,7 @@ class TimeSeriesDataset(Dataset):
             features = features[:, train_index: valid_index, :].reshape((-1, tau))
             labels = labels[:, train_index: valid_index].reshape((-1))
         elif test:
-            features = features[:, valid_index, :].reshape((-1, tau))
+            features = features[:, valid_index:, :].reshape((-1, tau))
             labels = labels[:, valid_index:].reshape((-1))
         self.features = features
         self.labels = labels

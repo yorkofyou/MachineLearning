@@ -148,3 +148,4 @@ cython_debug/
 *.pt
 *.pkl
 *.sav
+lightning_logs
