@@ -82,7 +82,7 @@ def predict(model, loss_fn, testing_loader):
     return y_valid, prediction
 
 
-def train_and_predict(path: str, tau: int, horizon: int, dropout: float) -> (np.ndarray, np.ndarray):
+def train_and_predict(path: str, tau: int, horizon: int, dropout: float, gpu: int) -> (np.ndarray, np.ndarray):
     print("Data loading ", end='')
     training_data = TimeSeriesDataset(path, tau, horizon, train=True)
     validation_data = TimeSeriesDataset(path, tau, horizon, valid=True)
@@ -100,6 +100,3 @@ def train_and_predict(path: str, tau: int, horizon: int, dropout: float) -> (np.
     print("Root Mean Squared Error: " + str(mean_squared_error(y_valid.reshape((-1)), predictions.reshape((-1)), squared=False)))
     # print("Root Relative Squared Error: " + str(get_rse(predictions, y_valid)))
     # print("Empirical Correlation Coefficient: " + str(get_corr(predictions, y_valid)))
-
-
-train_and_predict('../data/traffic.txt', tau=12, horizon=3, dropout=0.2)
