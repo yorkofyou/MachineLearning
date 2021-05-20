@@ -11,12 +11,10 @@ class Dataset:
         self.t, self.n = self.data.shape
 
     def generate_data(self, tau: int, horizon: int) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
-        # self.train_mean, self.train_std = self.data[:index].mean(axis=0, keepdims=True).T, self.data[:index].std(axis=0, keepdims=True).T
-        # self.valid_mean, self.valid_std = self.data[index:].mean(axis=0, keepdims=True).T, self.data[index:].std(axis=0, keepdims=True).T
-        self.data = self.data / np.max(np.abs(self.data), axis=0, keepdims=True)
+        # self.data = self.data / np.max(np.abs(self.data), axis=0, keepdims=True)
         assert horizon > 0
-        features = np.array([self.data[i-tau: i] for i in range(tau, self.t-horizon+1)])
-        # features = np.array([np.vstack((self.data[i-tau: i], np.amin(self.data[: i], axis=0), np.amax(self.data[: i], axis=0))) for i in range(tau, self.t-horizon+1)])
+        # features = np.array([self.data[i-tau: i] for i in range(tau, self.t-horizon+1)])
+        features = np.array([np.vstack((self.data[i-tau: i], np.amin(self.data[: i], axis=0), np.amax(self.data[: i], axis=0))) for i in range(tau, self.t-horizon+1)])
         labels = self.data[tau+horizon-1:]
         return self.train_test_split(np.transpose(features, (2, 0, 1)), np.transpose(labels, (1, 0)))  # (N, T, F) and (N, T, )
 
@@ -26,7 +24,7 @@ class Dataset:
         valid_index = int(t * 0.8)
         X_train, y_train = X[:, :train_index, :], y[:, :train_index]
         X_valid, y_valid = X[:, train_index: valid_index], y[:, train_index: valid_index]
-        X_test, y_test = X[: valid_index:], y[: valid_index]
+        X_test, y_test = X[:,  valid_index:, :], y[:, valid_index:]
         # X_train, X_valid = X_train.reshape((-1, f)), X_valid.reshape((-1, f))
         # y_train, y_valid = y_train.reshape((-1)), y_valid.reshape((-1))
         # Shuffle train set

@@ -118,4 +118,4 @@ def train_and_predict(path: str, tau: int, horizon: int) -> (np.ndarray, np.ndar
     # return predictions, y_valid
 
 
-train_and_predict('../datasets/traffic.txt', tau=12, horizon=3)
+train_and_predict('../data/traffic.txt', tau=12, horizon=3)

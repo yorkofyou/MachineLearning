@@ -18,10 +18,9 @@ def get_corr(y_predict, y_label):
     correlation = ((y_predict - mean_p) * (y_label - mean_g)).mean(axis=0) / (sigma_p * sigma_g)
     correlation = (correlation[index]).mean()
     return correlation
-    assert y_predict.shape == y_label.shape
-    y_label_mean = np.mean(y_label, axis=1, keepdims=True)
-    y_predict_mean = np.mean(y_predict, axis=1, keepdims=True)
-    return np.mean(np.mean((y_predict - y_predict_mean) * (y_label - y_label_mean), axis=0) / (np.std(y_predict, axis=0, keepdims=True) * np.std(y_label, axis=0, keepdims=True)))
+    # assert y_predict.shape == y_label.shape
+    # y_label_mean = np.mean(y_label, axis=1, keepdims=True)
+    # y_predict_mean = np.mean(y_predict, axis=1, keepdims=True)
     # numerator = np.sum((y_label - y_label_mean)*(y_predict - y_predict_mean), axis=1)
     # denominator = np.sqrt(np.sum((((y_label - y_label_mean)*(y_predict - y_predict_mean))**2), axis=1))
     # return np.mean(numerator / denominator)
