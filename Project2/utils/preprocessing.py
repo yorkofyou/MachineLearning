@@ -8,14 +8,15 @@ from sklearn.preprocessing import StandardScaler
 class Dataset:
     def __init__(self, path: str):
         self.data = pd.read_csv(path, header=None, delimiter=',').values
+        self.scale = np.max(np.abs(self.data), axis=0)
         self.t, self.n = self.data.shape
 
     def generate_data(self, tau: int, horizon: int) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
-        # self.data = self.data / np.max(np.abs(self.data), axis=0, keepdims=True)
+        data = self.data / np.max(np.abs(self.data), axis=0, keepdims=True)
         assert horizon > 0
-        # features = np.array([self.data[i-tau: i] for i in range(tau, self.t-horizon+1)])
-        features = np.array([np.vstack((self.data[i-tau: i], np.amin(self.data[: i], axis=0), np.amax(self.data[: i], axis=0))) for i in range(tau, self.t-horizon+1)])
-        labels = self.data[tau+horizon-1:]
+        # features = np.array([data[i-tau: i] for i in range(tau, self.t-horizon+1)])
+        features = np.array([np.vstack((data[i-tau: i], np.amin(data[: i], axis=0), np.amax(data[: i], axis=0))) for i in range(tau, self.t-horizon+1)])
+        labels = data[tau+horizon-1:]
         return self.train_test_split(np.transpose(features, (2, 0, 1)), np.transpose(labels, (1, 0)))  # (N, T, F) and (N, T, )
 
     def train_test_split(self, X: np.ndarray, y: np.ndarray) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):

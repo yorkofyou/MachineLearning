@@ -5,8 +5,7 @@ def get_rse(y_predict, y_label):
     assert y_predict.shape == y_label.shape
     label_rse = np.std(y_label) * np.sqrt((y_label.shape[0] - 1.) / y_label.shape[0])
     return np.sqrt(np.mean((y_predict - y_label) ** 2)) / label_rse
-    # y_mean = np.mean(y_label)
-    # return np.sqrt(np.sum((y_predict.reshape(-1) - y_label.reshape(-1)) ** 2) / np.sum((y_label.reshape(-1) - y_mean.reshape(-1)) ** 2))
+    # return np.sqrt(np.mean((y_predict.reshape(-1) - y_label.reshape(-1)) ** 2)) / np.std(y_predict, axis=None)
 
 
 def get_corr(y_predict, y_label):

@@ -23,6 +23,12 @@ if __name__ == '__main__':
     if dataset not in ('commodity', 'electricity', 'traffic'):
         print('No dataset')
         raise ValueError
+    if dataset == 'commodity':
+        n = 500
+    elif dataset == 'electricity':
+        n = 321
+    elif dataset == 'traffic':
+        n = 228
     horizon = args.horizon
     seed = args.seed
     seed_everything(seed)
@@ -34,8 +40,8 @@ if __name__ == '__main__':
     elif model == 'svr':
         svr.train_and_predict('datasets/' + dataset + '.txt', horizon=horizon, n_jobs=n_jobs)
     elif model == 'mlp':
-        mlp.train_and_predict('datasets/' + dataset + '.txt', horizon=horizon, dropout=dropout, gpu=gpu)
+        mlp.train_and_predict('datasets/' + dataset + '.txt', n=n, horizon=horizon, dropout=dropout, gpu=gpu)
     elif model == 'gru':
-        gru.train_and_predict('datasets/' + dataset + '.txt', horizon=horizon, dropout=dropout, gpu=gpu)
+        gru.train_and_predict('datasets/' + dataset + '.txt', n=n, horizon=horizon, dropout=dropout, gpu=gpu)
     else:
         raise NotImplementedError
