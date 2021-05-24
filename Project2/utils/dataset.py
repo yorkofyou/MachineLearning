@@ -26,14 +26,14 @@ class TimeSeriesDataset(Dataset):
         elif test:
             features = features[:, valid_index:, :]
             labels = labels[:, valid_index:]
-        self.features = features
-        self.labels = labels
+        self.features = features.reshape((-1, features.shape[2]))
+        self.labels = labels.reshape((-1, 1))
 
     def __getitem__(self, idx):
-        return torch.from_numpy(np.array(self.features[:, idx])).float(), torch.from_numpy(np.array(self.labels[:, idx])).float()
+        return torch.from_numpy(np.array(self.features[idx])).float(), torch.from_numpy(np.array(self.labels[idx])).float()
 
     def __len__(self):
-        return self.features.shape[1]
+        return self.features.shape[0]
 
     def get_scale(self):
         return self.scale

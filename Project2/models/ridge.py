@@ -41,8 +41,8 @@ def grid_search(path: str, params: dict, n_jobs: int):
                 best_predictions = np.array([models[i].predict(X_test[i]) for i in range(num_models)])
                 test_rmse = mean_squared_error((y_test.T * data.scale).reshape((-1)),
                                                (best_predictions.T * data.scale).reshape((-1)), squared=False)
-                test_rse = get_rse(best_predictions, y_test)
-                test_corr = get_corr(best_predictions, y_test)
+                test_rse = get_rse((best_predictions.T * data.scale).reshape((data.n, -1)), (y_test.T * data.scale).reshape((data.n, -1)))
+                test_corr = get_corr((best_predictions.T * data.scale).reshape((data.n, -1)), (y_test.T * data.scale).reshape((data.n, -1)))
     filename = os.path.join('models', 'save', '_'.join(['ridge', name])) + '.pkl'
     pkl.dump(best_model, open(filename, 'wb'))
     print("Root Mean Squared Error: " + str(test_rmse))

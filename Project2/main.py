@@ -40,8 +40,8 @@ if __name__ == '__main__':
     elif model == 'svr':
         svr.train_and_predict('datasets/' + dataset + '.txt', horizon=horizon, n_jobs=n_jobs)
     elif model == 'mlp':
-        mlp.train_and_predict('datasets/' + dataset + '.txt', n=n, horizon=horizon, dropout=dropout, gpu=gpu)
+        mlp.train_and_predict('datasets/' + dataset + '.txt', horizon=horizon, dropout=dropout, gpu=gpu)
     elif model == 'gru':
-        gru.train_and_predict('datasets/' + dataset + '.txt', n=n, horizon=horizon, dropout=dropout, gpu=gpu)
+        gru.train_and_predict('datasets/' + dataset + '.txt', horizon=horizon, dropout=dropout, gpu=gpu)
     else:
         raise NotImplementedError
