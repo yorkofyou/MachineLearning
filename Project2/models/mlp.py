@@ -19,8 +19,8 @@ class NeuralNetwork(pl.LightningModule):
         dataset = TimeSeriesDataset(self.path, self.tau, self.horizon)
         self.scale = torch.from_numpy(dataset.get_scale()).T
         self.n = dataset.n
-        self.ll1 = nn.Linear(tau, 2*tau)
-        self.ll2 = nn.Linear(2*tau, tau // 2)
+        self.ll1 = nn.Linear(tau, tau*2)
+        self.ll2 = nn.Linear(tau*2, tau // 2)
         self.ll3 = nn.Linear(tau // 2, 1)
         self.dropout = nn.Dropout(dropout_prob)
         self.backbone = nn.Sequential(self.ll1, self.ll2, self.ll3)
@@ -35,7 +35,7 @@ class NeuralNetwork(pl.LightningModule):
         optimizer = optim.Adam([
             {'params': self.backbone.parameters()},
             ], lr=1e-3)
-        exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+        exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
         return [optimizer], [exp_lr_scheduler]
 
     def training_step(self, batch, batch_idx):
@@ -97,27 +97,52 @@ class NeuralNetwork(pl.LightningModule):
         return test_loader
 
 
+def test(model: pl.LightningModule):
+    dataloader = model.test_dataloader()
+    predictions = list()
+    labels = list()
+    model.eval()
+    with torch.no_grad():
+        for x, y in dataloader:
+            prediction = model.forward(x)
+            predictions.append(prediction)
+            labels.append(y)
+    predictions = torch.cat(predictions)
+    labels = torch.cat(labels)
+    test_rmse = F.mse_loss((predictions.reshape((model.n, -1)) * model.scale).reshape((-1)),
+                           (labels.reshape((model.n, -1)) * model.scale).reshape((-1)))
+    test_rse = get_rse((predictions.reshape((model.n, -1)) * model.scale).cpu().detach().numpy(),
+                       (labels.reshape((model.n, -1)) * model.scale).cpu().detach().numpy())
+    test_corr = get_corr((predictions.reshape((model.n, -1)) * model.scale).cpu().detach().numpy(),
+                         (labels.reshape((model.n, -1)) * model.scale).cpu().detach().numpy())
+    print("Root Mean Squared Error: " + str(torch.sqrt(test_rmse)))
+    print("Root Relative Squared Error: " + str(test_rse))
+    print("Empirical Correlation Coefficient: " + str(test_corr))
+
+
 def grid_search(path: str, params: dict, gpu: int):
     gpus = -1 if gpu != 0 else 0
     tau_list = params['tau']
     horizon = params['horizon']
     dropout = params['dropout']
-    best_trainer = None
+    best_model = None
     best_rmse = 10000000
     for tau in tau_list:
         model = NeuralNetwork(path, tau, horizon, dropout)
         trainer = pl.Trainer(max_epochs=50000, callbacks=[EarlyStopping(monitor='val_loss')], gpus=gpus)
+        lr_finder = trainer.tuner.lr_find(model)
+        new_lr = lr_finder.suggestion()
+        model.hparams.lr = new_lr
         trainer.fit(model)
         rmse = torch.sqrt(trainer.callback_metrics['val_loss'])
         if rmse < best_rmse:
-            best_trainer = trainer
+            best_model = model
             best_rmse = rmse
-    best_trainer.test()
-    print("Root Mean Squared Error: " + str(torch.sqrt(best_trainer.callback_metrics['test_loss'])))
+    test(best_model)
 
 
 def train_and_predict(path: str, horizon: int, dropout: float, gpu: int) -> (np.ndarray, np.ndarray):
-    params = {'tau': [64],
+    params = {'tau': [2 ** i for i in range(10)],
               'horizon': horizon,
               'dropout': dropout}
     grid_search(path, params=params, gpu=gpu)

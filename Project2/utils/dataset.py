@@ -13,6 +13,7 @@ class TimeSeriesDataset(Dataset):
         assert horizon > 0
         train_index = int(self.t * 0.6)
         valid_index = int(self.t * 0.8)
+        # features = np.array([np.vstack((data[i-tau: i], np.amin(data[: i], axis=0), np.amax(data[: i], axis=0))) for i in range(tau, self.t-horizon+1)])
         features = np.array([data[i-tau: i] for i in range(tau, self.t-horizon+1)])
         labels = data[tau+horizon-1:]
         features = np.transpose(features, (2, 0, 1))
