@@ -8,7 +8,6 @@ from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import Ridge
 from utils.preprocessing import *
 from utils.evaluate import *
-from utils.plot import *
 
 
 def train_model(X: np.ndarray, y: np.ndarray, reg: float) -> BaseEstimator:

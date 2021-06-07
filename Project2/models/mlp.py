@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from utils.dataset import *
 from utils.evaluate import *
-from utils.plot import *
 
 
 class NeuralNetwork(pl.LightningModule):
@@ -19,9 +18,9 @@ class NeuralNetwork(pl.LightningModule):
         dataset = TimeSeriesDataset(self.path, self.tau, self.horizon)
         self.scale = torch.from_numpy(dataset.get_scale()).T
         self.n = dataset.n
-        self.ll1 = nn.Linear(tau, tau*2)
-        self.ll2 = nn.Linear(tau*2, tau // 2)
-        self.ll3 = nn.Linear(tau // 2, 1)
+        self.ll1 = nn.Linear(tau, tau * 2)
+        self.ll2 = nn.Linear(tau * 2, tau)
+        self.ll3 = nn.Linear(tau, 1)
         self.dropout = nn.Dropout(dropout_prob)
         self.backbone = nn.Sequential(self.ll1, self.ll2, self.ll3)
 

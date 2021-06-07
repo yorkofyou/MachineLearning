@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from utils.dataset import *
 from utils.evaluate import *
-from utils.plot import *
 
 
 class NeuralNetwork(pl.LightningModule):
@@ -15,7 +14,7 @@ class NeuralNetwork(pl.LightningModule):
         super(NeuralNetwork, self).__init__()
         self.path = path
         self.tau = tau
-        num_units = tau
+        num_units = 2 ** 6
         self.horizon = horizon
         dataset = TimeSeriesDataset(self.path, self.tau, self.horizon)
         self.scale = torch.from_numpy(dataset.get_scale()).T
@@ -39,7 +38,7 @@ class NeuralNetwork(pl.LightningModule):
         optimizer = optim.Adam([
             {'params': self.backbone.parameters()},
         ], lr=1e-3)
-        exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+        exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
         return [optimizer], [exp_lr_scheduler]
 
     def training_step(self, batch, batch_idx):
